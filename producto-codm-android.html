@@ -1,28 +1,141 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>CODM Android - Yulian Store</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #0d1117; color: white; padding: 2rem; }
-        .container { max-width: 700px; margin: auto; }
-        img { max-width: 100%; margin-bottom: 1rem; border-radius: 5px; }
-    </style>
+<meta charset="UTF-8" />
+<title>CODM Android - Yulian Store</title>
+<style>
+  #bg-video {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100vw;
+      min-height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+      filter: none;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background: transparent;
+    color: white;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .container {
+    max-width: 700px;
+    margin: auto;
+    background: rgba(33, 38, 45, 0.85);
+    padding: 1rem 2rem 2rem;
+    border-radius: 8px;
+  }
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 900;
+  }
+  img {
+    max-width: 100%;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+  }
+  p {
+    font-size: 1.1rem;
+    margin: 0.3rem 0;
+  }
+  button {
+    padding: 12px 20px;
+    background: #f0b90b;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 1rem;
+  }
+  #precios, #confirmar, #wallet {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+  }
+  #wallet {
+    margin-top: 15px;
+    background: #222;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: monospace;
+    word-break: break-word;
+  }
+  #copyMessage {
+    color: #0f0;
+    margin-top: 8px;
+    font-weight: bold;
+    display: none;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>CODM Android</h1>
-        <img src="Captura de pantalla 2025-08-07 070045.png" alt="CODM Android">
-        <p>✅ Cheat ANTIBAN Compatible Con Android</p>
-        <p>✅ No Necesitas Root</p>
-        <p>✅ Entrega Automatica y Soporte 24/7</p>
-        <h3>Precios:</h3>
-        <ul>
-            <li>1 Día: $10</li>
-            <li>1 Semana: $20</li>
-            <li>1 Mes: $35</li>
-        </ul>
+  <video id="bg-video" autoplay loop muted playsinline>
+    <source src="fondo.mp4" type="video/mp4" />
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <div class="container">
+    <h1>CODM Android</h1>
+    <img src="Captura de pantalla 2025-08-07 070045.png" alt="CODM Android" />
+    <p>✅ Cheat ANTIBAN Compatible Con Android</p>
+    <p>✅ No Necesitas Root</p>
+    <p>✅ Entrega Automatica y Soporte 24/7</p>
+
+    <button id="btnComprar">COMPRAR</button>
+
+    <div id="precios">
+      <h3>Precios:</h3>
+      <ul>
+        <li>1 Día: $10</li>
+        <li>1 Semana: $20</li>
+        <li>1 Mes: $35</li>
+      </ul>
+      <button id="btnPagar">Pagar con Binance (USDT)</button>
     </div>
+
+    <div id="confirmar">
+      <button id="btnConfirmar">Confirmar Compra</button>
+    </div>
+
+    <div id="wallet">
+      <p><strong>Red:</strong> TRC20 (TRX Tron)</p>
+      <p><strong>Dirección USDT:</strong></p>
+      <div id="walletAddress">TL3H8RXgEdaFid6ZBCB9mQoJ9TtBtptebR</div>
+      <button id="btnCopy">Copiar dirección</button>
+      <div id="copyMessage">¡Dirección copiada al portapapeles!</div>
+    </div>
+  </div>
+
+<script>
+  document.getElementById('btnComprar').addEventListener('click', () => {
+    document.getElementById('precios').style.display = 'block';
+  });
+
+  document.getElementById('btnPagar').addEventListener('click', () => {
+    document.getElementById('confirmar').style.display = 'block';
+  });
+
+  document.getElementById('btnConfirmar').addEventListener('click', () => {
+    document.getElementById('wallet').style.display = 'block';
+  });
+
+  document.getElementById('btnCopy').addEventListener('click', () => {
+    const walletAddress = document.getElementById('walletAddress').textContent;
+    navigator.clipboard.writeText(walletAddress).then(() => {
+      const msg = document.getElementById('copyMessage');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    });
+  });
+</script>
 </body>
 </html>
