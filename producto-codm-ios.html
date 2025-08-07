@@ -5,14 +5,12 @@
 <title>CODM iOS - Yulian Store</title>
 <style>
   #bg-video {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100vw;
-      min-height: 100vh;
-      object-fit: cover;
-      z-index: -1;
-      filter: none;
+    position: fixed;
+    right: 0; bottom: 0;
+    min-width: 100vw; min-height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    filter: none;
   }
   body {
     font-family: Arial, sans-serif;
@@ -43,6 +41,19 @@
     font-size: 1.1rem;
     margin: 0.3rem 0;
   }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 15px;
+  }
+  input[type="text"] {
+    padding: 6px;
+    margin: 8px 0 12px;
+    width: 100%;
+    max-width: 250px;
+    border-radius: 4px;
+    border: none;
+  }
   button {
     padding: 12px 20px;
     background: #f0b90b;
@@ -50,8 +61,11 @@
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 20px;
+    margin-top: 10px;
     font-size: 1rem;
+  }
+  #btnApplyCoupon {
+    background: #0a84ff;
   }
   #precios, #confirmar, #wallet {
     display: none;
@@ -65,11 +79,16 @@
     font-family: monospace;
     word-break: break-all;
   }
-  #copyMessage {
-    color: #0f0;
+  #copyMessage, #couponMessage {
     margin-top: 8px;
     font-weight: bold;
     display: none;
+  }
+  #copyMessage {
+    color: #0f0;
+  }
+  #couponMessage {
+    margin-bottom: 10px;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -95,10 +114,14 @@
 
     <div id="precios">
       <h3>Precios:</h3>
-      <ul>
-        <li>1 Día: $10</li>
-        <li>1 Semana: $20</li>
-        <li>1 Mes: $35</li>
+      <label for="couponInput">Ingrese código de cupón para descuento:</label>
+      <input type="text" id="couponInput" placeholder="Escribe tu cupón aquí" />
+      <button id="btnApplyCoupon">Aplicar cupón</button>
+      <div id="couponMessage"></div>
+      <ul id="priceList">
+        <li data-price="10">1 Día: $10</li>
+        <li data-price="20">1 Semana: $20</li>
+        <li data-price="35">1 Mes: $35</li>
       </ul>
       <button id="btnPagar">Pagar con Binance (USDT)</button>
     </div>
@@ -116,27 +139,70 @@
     </div>
   </div>
 
-  <script>
-    document.getElementById('btnComprar').addEventListener('click', () => {
-      document.getElementById('precios').style.display = 'block';
-    });
+<script>
+  const btnComprar = document.getElementById('btnComprar');
+  const preciosDiv = document.getElementById('precios');
+  const btnApplyCoupon = document.getElementById('btnApplyCoupon');
+  const couponInput = document.getElementById('couponInput');
+  const couponMessage = document.getElementById('couponMessage');
+  const priceList = document.getElementById('priceList');
+  const btnPagar = document.getElementById('btnPagar');
+  const confirmarDiv = document.getElementById('confirmar');
+  const btnConfirmar = document.getElementById('btnConfirmar');
+  const walletDiv = document.getElementById('wallet');
+  const btnCopy = document.getElementById('btnCopy');
+  const copyMessage = document.getElementById('copyMessage');
 
-    document.getElementById('btnPagar').addEventListener('click', () => {
-      document.getElementById('confirmar').style.display = 'block';
-    });
+  btnComprar.addEventListener('click', () => {
+    preciosDiv.style.display = 'block';
+  });
 
-    document.getElementById('btnConfirmar').addEventListener('click', () => {
-      document.getElementById('wallet').style.display = 'block';
-    });
+  btnApplyCoupon.addEventListener('click', () => {
+    const cupon = couponInput.value.trim().toUpperCase();
+    const descuentos = {
+      'DESCUENTO20': 0.8,
+      'OFERTA10': 0.9
+    };
+    if (cupon in descuentos) {
+      couponMessage.style.color = 'lightgreen';
+      const descuentoPercent = (100 * (1 - descuentos[cupon])).toFixed(0);
+      couponMessage.textContent = `Cupón aplicado con éxito: ${descuentoPercent}% de descuento`;
+      couponMessage.style.display = 'block';
+      // Actualizar precios
+      for (const li of priceList.children) {
+        const originalPrice = parseFloat(li.getAttribute('data-price'));
+        const newPrice = (originalPrice * descuentos[cupon]).toFixed(2);
+        li.textContent = li.textContent.replace(/\$\d+(\.\d{1,2})?/, `$${newPrice}`);
+      }
+    } else {
+      couponMessage.style.color = 'red';
+      couponMessage.textContent = 'Cupón inválido o expirado.';
+      couponMessage.style.display = 'block';
+      // Restaurar precios originales si el cupón es inválido
+      for (const li of priceList.children) {
+        const originalPrice = parseFloat(li.getAttribute('data-price'));
+        li.textContent = li.textContent.replace(/\$\d+(\.\d{1,2})?/, `$${originalPrice}`);
+      }
+    }
+  });
 
-    document.getElementById('btnCopy').addEventListener('click', () => {
-      const walletAddress = document.getElementById('walletAddress').textContent;
-      navigator.clipboard.writeText(walletAddress).then(() => {
-        const msg = document.getElementById('copyMessage');
-        msg.style.display = 'block';
-        setTimeout(() => { msg.style.display = 'none'; }, 2000);
-      });
+  btnPagar.addEventListener('click', () => {
+    confirmarDiv.style.display = 'block';
+  });
+
+  btnConfirmar.addEventListener('click', () => {
+    walletDiv.style.display = 'block';
+  });
+
+  btnCopy.addEventListener('click', () => {
+    const address = document.getElementById('walletAddress').textContent;
+    navigator.clipboard.writeText(address).then(() => {
+      copyMessage.style.display = 'block';
+      setTimeout(() => {
+        copyMessage.style.display = 'none';
+      }, 2000);
     });
-  </script>
+  });
+</script>
 </body>
 </html>
